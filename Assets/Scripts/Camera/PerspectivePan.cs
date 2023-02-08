@@ -6,7 +6,7 @@ public class PerspectivePan : MonoBehaviour
 {
 	private Vector3 touchStart;
 	public float zoomMin = 1;
-	public float zoomMax = 8;
+	public float zoomMax = 24;
 
 	// Start is called before the first frame update
 	void Start()
@@ -72,7 +72,7 @@ public class PerspectivePan : MonoBehaviour
 
 	void zoom(float zoom)
 	{
-		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - zoom /* Mathf.Min(Mathf.Log10(Camera.main.orthographicSize), 0.1f)*/, zoomMin, zoomMax);
+		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - zoom * Mathf.Min(Mathf.Log(Camera.main.orthographicSize, 8)), zoomMin, zoomMax);
 	}
 
 	enum PinchMode
