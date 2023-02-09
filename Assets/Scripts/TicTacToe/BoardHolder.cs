@@ -5,14 +5,18 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
+using System.CodeDom.Compiler;
+using Unity.VisualScripting;
 
-//#if (UNITY_EDITOR)
-//using UnityEditor;
-//#endif
+#if (UNITY_EDITOR)
+using UnityEditor;
+using UnityEditor.UIElements;
+#endif
 
 public class BoardHolder : MonoBehaviour
 {
-	public Board GameArea = new Board(TicTac.none);
+	public Board GameArea = new Board();
 	public TicTac nextPlayer = TicTac.X;
 	public (bool success, TicTac nextPlayer) Play(int place)
 	{
@@ -24,12 +28,14 @@ public class BoardHolder : MonoBehaviour
 	}
 }
 
-public struct Board
+[Serializable]
+public class Board
 {
+	[HideInInspector]
 	public TicTac[] BoardAsArray
 	{
 		get { return new TicTac[9] { TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight}; }
-		set { if (value.Length != 9) throw new Exception("Invalid length exception:\nLength should be exactly 9 !"); TopLeft = value[0]; TopCenter = value[1]; TopRight = value[2]; MiddleLeft = value[3]; MiddleCenter = value[4]; MiddleRight = value[5]; BottomLeft = value[6]; BottomCenter = value[7]; BottomRight = value[8]; }
+		set { if (value.Length != 9) throw new Board.InvalidLengthException(9, value.Length); TopLeft = value[0]; TopCenter = value[1]; TopRight = value[2]; MiddleLeft = value[3]; MiddleCenter = value[4]; MiddleRight = value[5]; BottomLeft = value[6]; BottomCenter = value[7]; BottomRight = value[8]; }
 	}
 	public TicTac TopLeft { get; set; }
 	public TicTac TopCenter { get; set; }
@@ -46,7 +52,8 @@ public struct Board
 		set { BoardAsArray[i] = value; }
 	}
 
-	public Board(TicTac? preset) // Empty constructors are allowed only in C# 10.0 and higher, which is not supported in Unity, because it uses C# 9.0
+	public Board() => new Board(TicTac.none);
+	public Board(TicTac? preset)
 	{
 		TopLeft = preset ?? TicTac.none;
 		TopCenter = preset ?? TicTac.none;
@@ -74,6 +81,20 @@ public struct Board
 		BottomCenter = bottomCenter;
 		BottomRight = bottomRight;
 	}
+	public class InvalidLengthException : Exception
+	{
+		public int expectedLength { get; private set; }
+		public int actualLength { get; private set; }
+		public InvalidLengthException(int expected, int actual)
+		{
+			expectedLength = expected;
+			actualLength = actual;
+		}
+		public override string ToString()
+		{
+			return $"Array of invalid length provided!\nExpected: {expectedLength}, Provided: {actualLength}";
+		}
+	}
 }
 
 public enum TicTac
@@ -96,17 +117,31 @@ public static class TicTacExtensions
 	}
 }
 
-//#if (UNITY_EDITOR)
-//[CustomEditor]
-//[CanEditMultipleObjects]
-//public class BoardHolderEditor : Editor
-//{
-
-//}
-
-//[CustomPropertyDrawer(typeof(Board))]
-//public class BoardEditor : PropertyDrawer
-//{
-
-//}
-//#endif
+/*#if (UNITY_EDITOR)
+[CustomPropertyDrawer(typeof(Board))]
+public class BoardEditor : PropertyDrawer
+{
+	//public override VisualElement CreatePropertyGUI(SerializedProperty property)
+	//{
+	//	VisualElement container = new VisualElement();
+	//	SerializedProperty TopLeft = property.FindPropertyRelative("TopLeft");
+	//	container.Add(new EnumField("TopLeft", TicTac.none));
+	//	return container;
+	//}
+	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+	{
+		EditorGUI.BeginProperty(position, label, property);
+		// Label
+		position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+		int indent = EditorGUI.indentLevel;
+		EditorGUI.indentLevel = 0;
+		// Rect
+		Rect border = new Rect(position.x, position.y, 30, position.height);
+		// Draw fields
+		EditorGUI.PropertyField(border, property.FindPropertyRelative("TopLeft"), GUIContent.none);
+		// Reset indent
+		EditorGUI.indentLevel = indent;
+		EditorGUI.EndProperty();
+	}
+}
+#endif*/

@@ -647,6 +647,7 @@ GameObject:
   - component: {fileID: 979988579}
   - component: {fileID: 979988580}
   - component: {fileID: 979988581}
+  - component: {fileID: 979988582}
   m_Layer: 0
   m_Name: GameArea
   m_TagString: Untagged
@@ -699,6 +700,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoomMin: 1
   zoomMax: 24
+--- !u!114 &979988582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979988578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc70184723ad5b4483c73331977231a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextPlayer: 1
 --- !u!1 &1102137386
 GameObject:
   m_ObjectHideFlags: 0
